@@ -1,0 +1,25 @@
+{%- macro render_screenshot_spoiler(id, screenshots) -%}
+    <p><button class="btn btn-outline-info" type="button" data-toggle="collapse" data-target="#{{ id }}" aria-expanded="false" aria-controls="{{ id }}">Show screenshot{{ 's' if screenshots|length > 1 else '' }}</button></p>
+    <div class="collapse mb-2" id="{{ id }}">
+        <div class="card card-body">
+            {% for screenshot in screenshots %}
+                <figure class="figure">
+                    <img class="figure-img img-fluid" alt="{{ screenshot.alt }}" src="{{ url_for('static', filename=screenshot.url) }}" />
+                    <figcaption class="figure-caption">{{ screenshot.caption }}</figcaption>
+                </figure>
+            {% endfor %}
+        </div>
+    </div>
+{%- endmacro -%}
+{%- macro render_code_spoiler(id, code_lines) -%}
+    <p><button class="btn btn-outline-info" type="button" data-toggle="collapse" data-target="#{{ id }}" aria-expanded="false" aria-controls="{{ id }}">Show code</button></p>
+    <div class="collapse mb-2" id="{{ id }}">
+        <div class="card card-body">
+            <pre>
+                {%- for code_line in code_lines %}
+{{ code_line }}
+                {%- endfor -%}
+            </pre>
+        </div>
+    </div>
+{%- endmacro -%}

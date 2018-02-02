@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 class="mt-5">Workshop</h1>
+    <p>The goal of this workshop is to show you how you can setup a CI/CD pipeline. To make it rather simple, this exact application which you're now visting will be used for this purpose.</p>
+    <p>The application is a mini-website (built using the Flask micro-framework) programmed in Python. It has only about 200 lines of Python code (excluding tests).</p>
+    <p>Due to time constraints, a limited pipeline will be set up. However, the basic principles of the services will be demonstrated, which should allow you to set up a complete pipeline if interested.</p>
+    <h2>Used tools</h2>
+    <p>We will focus on using "free" (for open-source) tools that can be (easily) integrated into GitHub so that you don't need to bother with setting up local instances.</p>
+    <h3>GitHub</h3>
+    <p><a href="https://github.com/" target="_blank">GitHub</a> is a DVC (Distributed Version Control) service which offers SCM (Source Code Management) using Git. GitHub offers unlimited public repositories for free, and paid private repositories.</p>
+    <p>Some alternatives for GitHub are BitBucket and GitLab. For this workshop GitHub was chosen because it has the largest collection of integrations available.</p>
+    <h3>Travis CI</h3>
+    <p><a href="https://travis-ci.org/" target="_blank">Travis CI</a> is the service that is doing the heavy-lifting. It automatically gets notified of the changes you pushed to GitHub, and then pulls in those changes and performs a set of tasks for you.</p>
+    <p>Most of the time this includes creating builds (with multiple OS'es, or programming language versions), running tests and also deploying the code.</p>
+    <p>Alternatives for Travis CI include CircleCI, AppVeyor and Semaphore.</p>
+    <h3>Codecov</h3>
+    <p><a href="https://codecov.io/" target="_blank">Codecov</a> is a code quality measurement tool. It generated coverage reports based on the data it receives from test suites that are ran with coverage.</p>
+    <p>This enables you to check on how much of your code is covered by unit tests.</p>
+    <p>The reporting step in this workshop has been worked out with Codecov, but <a href="https://coveralls.io/" target="_blank">Coveralls</a> or <a href="https://codeclimate.com/" target="_blank">CodeClimate</a> could be used just as well.</p>
+    <h3>Heroku</h3>
+    <p><a href="https://www.heroku.com/" target="_blank">Heroku</a> offers a PaaS (Platform as a Service), which can be used to run the application on without having to worry about the back-end or underlying platform.</p>
+    <p>We will use Heroku to deploy this app onto automatically once the tests pass.</p>
+    <h2>Bringing it all together</h2>
+    <p>If all the tools above are combined and tied together, the next flow can be achieved:</p>
+    <p class="text-center"><img class="img-fluid" src="{{ url_for('static', filename='img/flow.png') }}" /></p>
+    <h2>Ready, set, go</h2>
+    <p>One last thing before you start: If you can't find the solution, you can look at the screenshot(s) for some tips (that's why they're hidden by default), or just ask a question!</p>
+    <p class="pb-5"><a class="btn btn-lg btn-primary" href="{{ url_for('my_workshop') }}" role="button"><i class="fas fa-play"></i> Start my workshop</a></p>
+{% endblock %}

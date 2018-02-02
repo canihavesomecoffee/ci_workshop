@@ -1,0 +1,59 @@
+{% extends "workshop_step.html" %}
+
+{% block step_content %}
+    <h1>{{ current_step }}. Set up Travis</h1>
+    <p>This is were it all comes together. In this step we'll configure Travis to automatically run tests, post coverage reports to the tools and make a deployment on Heroku.</p>
+    <h2>Sign up on Travis</h2>
+    <p>The first thing to do is to sign up on Travis CI if you don't have an account yet. Luckily, Travis CI provides OAuth integration with GitHub, just as Codecov from a previous step.</p>
+    <p>The homepage of <a href="https://travis-ci.org" target="_blank">Travis CI</a> has a huge green button that just invites you to click on it ;)</p>
+    {{ macros.render_screenshot_spoiler('screenshots', [
+        {'alt': 'Sign up on Travis CI', 'caption': 'The home page lists a nice big green button that wants to be clicked', 'url': 'img/travis/sign-up.png'},
+        {'alt': 'Allow Travis access to your GitHub account', 'caption': 'Travis needs access to your GitHub account in order to work properly.', 'url': 'img/travis/authorize.png'}
+    ]) }}
+    <p>After signing up on Travis, the application will sync with your repositories, and then give you an overview on your account of all the repositories it found.</p>
+    <h2>Enable Travis for the repository</h2>
+    <p>By default Travis will not do anything with the repositories it finds. In order to activate Travis CI for your repository, you just need to toggle the correct switch.</p>
+    {{ macros.render_screenshot_spoiler('screenshots2', [{'alt': 'Flip the switch', 'caption': 'Enabling Travis CI for a repository is as "easy" as toggling a switch.', 'url': 'img/travis/enable.png'}]) }}
+    <p>Now that Travis is enabled for your repository, it's time to start preparing for the actual configuration of Travis.</p>
+    <h2>Prepare the Travis configuration file</h2>
+    <p>In the previous step you copied the Heroku application key. Given that this key allows access to your Heroku account, we don't want to put this in plain sight inside the Travis configuration file. Luckily Travis CI provides <a href="https://docs.travis-ci.com/user/encryption-keys/">an option to encrypt sensitive values</a>.</p>
+    <p>You should now get (depending on your favourite framework) get one of the next Travis toolboxes, so you can encrypt the Heroku Application key for safe usage in the config file:</p>
+    <ul>
+        <li>Ruby (official Heroku app, see <a href="https://docs.travis-ci.com/user/encryption-keys/">documentation</a> for more details):<br />
+            <pre>
+gem install travis
+travis encrypt {app_key}</pre>
+        </li>
+        <li>Python:<br />
+            <pre>
+pip install travis-encrypt
+travis-encrypt {github_username} ci_workshop</pre>
+            {{ macros.render_screenshot_spoiler('screenshots3', [
+                {'alt': 'Securely encrypted API key', 'caption': 'Using the python tool you get a securely encrypted key that can be worrilessly pasted in the Travis configuration file.', 'url': 'img/travis/secure-encrypt.png'}
+            ]) }}
+        </li>
+        <li>Online version: <a href="https://travis-encrypt.github.io/">https://travis-encrypt.github.io/</a></li>
+        <li>Node: <a href="https://www.npmjs.com/package/travis-encrypt">https://www.npmjs.com/package/travis-encrypt</a></li>
+        <li>Bash: <a href="https://github.com/dlenski/travis-encrypt-sh">dlenski/travis-encrypt-sh</a></li>
+    </ul>
+    <p>Now that we have secured the Heroku application key, we can create our Travis configuration.</p>
+    <h2>Add a Travis configuration file to the repository</h2>
+    <p>Travis has quite extensive <a href="https://docs.travis-ci.com/user/languages/python/">documentation</a> for many languages, including python. We want to make a configuration that ticks the next checkmarks:</p>
+    <ul>
+        <li>Runs the test suite with coverage (use <a href="https://pypi.python.org/pypi/nose-cov">nose-cov</a> for this, the repository already has a .coveragerc file present with settings)</li>
+        <li>Performs these tests on the next Python versions:<br />
+            <ul>
+                <li>3.6</li>
+                <li>nightly</li>
+            </ul>
+        </li>
+        <li>Upload the coverage results to the tool you configured in the previous step (<a href="https://github.com/codecov/example-python">example for Codecov</a>)</li>
+        <li>After a successful run, <a href="https://docs.travis-ci.com/user/deployment/heroku/">deploy to Heroku</a></li>
+    </ul>
+    <div class="alert alert-info" role="alert">You can check your .yml on <a href="http://lint.travis-ci.org/">http://lint.travis-ci.org/</a> before committing it on your repository.</div>
+    {{ macros.render_code_spoiler('snippet', ['language: python', 'python:', '  - 3.6', '  - nightly', 'install:', '  - pip install -r requirements/dev.txt', 'script:', '  - nosetests --with-cov --cov-config .coveragerc', 'after_success:', '  - codecov', 'deploy:', '  provider: heroku', '  api_key:', '    secure: {insert secret here}', '  app: ci-workshop-lyon', '  on:', '    repo: {gh_username}/ci_workshop']) }}
+    <p>If the travis.yml was added to the repository, you should now see that Travis starts building whenever you make a new commit.</p>
+    {{ macros.render_screenshot_spoiler('screenshots4', [
+        {'alt': 'Failed build', 'caption': 'Even when you are experienced with software, things sometimes take some trial and error...', 'url': 'img/travis/failed-build.png'}
+    ]) }}
+{% endblock %}

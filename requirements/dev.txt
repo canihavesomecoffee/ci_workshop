@@ -1,0 +1,7 @@
+# Require common
+-r common.txt
+Flask-Testing>=0.7.1
+blinker>=1.4.0
+nose
+nose-cov
+codecov

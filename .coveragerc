@@ -1,0 +1,18 @@
+[run]
+branch = True
+omit =
+    tests/*
+    *__init__*
+    venv/*
+    init_db.py
+
+[report]
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise NotImplementedError
+    pass
+    # Ignore main code
+    if __name__ == .__main__.:

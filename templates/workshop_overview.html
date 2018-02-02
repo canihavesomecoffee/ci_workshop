@@ -1,0 +1,19 @@
+{% extends "workshop_step.html" %}
+
+{% block step_content %}
+    <p class="text-center"><img class="img-fluid" alt="That's it!" src="{{ url_for('static', filename='img/end.gif') }}" /></p>
+    <p>We now should have set up a full CI pipeline. Whenever you:</p>
+    <ul>
+        <li>Open a Pull Request</li>
+        <li>Commit to master</li>
+    </ul>
+    <p>Then the tests will be automatically run, a code coverage report will be generated, and if the tests passed the app will be automatically deployed.</p>
+    <h2>What next?</h2>
+    <p>In case you want to experiment some further, here are some suggestions for things you can try to out to experience the utility of the pipeline:</p>
+    <ul>
+        <li>Add a new page to the application (e.g. a daily quotes/joke which gets pulled from the DB), with including tests</li>
+        <li>Add some more unittests to improve coverage</li>
+        <li>Try to integrate some integration test services (e.g. PhantomJS on Travis (see <a href="https://docs.travis-ci.com/user/gui-and-headless-browsers/#Using-PhantomJS" target="_blank">Using PhantomJS</a> and <a href="https://docs.travis-ci.com/user/build-stages/deploy-heroku/" target="_blank">Build stages</a>)</li>
+        <li>...</li>
+    </ul>
+{% endblock %}

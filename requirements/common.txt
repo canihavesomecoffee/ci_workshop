@@ -1,0 +1,7 @@
+# Common requirements
+flask>=0.12.2
+Flask-SQLAlchemy>=2.3.1
+Flask-WTF>=0.14.2
+wtforms>=2.1
+passlib>=1.7.1
+gunicorn>=19.7.1

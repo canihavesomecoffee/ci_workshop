@@ -1,0 +1,24 @@
+{% extends "workshop_step.html" %}
+
+{% block step_content %}
+    <h1>{{ current_step }}. Set up a coverage tool</h1>
+    <p>We also want to keep track of the code coverage of our tests. This way we can keep an eye on sections of code that could be more buggy then others.</p>
+    <p>There are various coverage tools available (e.g. codecov, coveralls, codeclimate), but for this workshop the example will use Codecov. If you want to try out another one, feel free :)</p>
+    <h2>Sign up on Codecov</h2>
+    <p>An account is needed for <a href="https://codecov.io" target="_blank">Codecov.io</a>, but luckily they provide OAuth integration with GitHub, so you don't need to remember yet another username/password combination.</p>
+    {{ macros.render_screenshot_spoiler('screenshots', [
+        {'alt': 'Allow Codecov access to your GitHub account', 'caption': 'Codecov needs access to your GitHub account in order to work properly.', 'url': 'img/codecov/authorize.png'}
+    ]) }}
+    <h2>Install the Codecov on your GitHub account</h2>
+    <p>This will allow Codecov to not only generate reports, but also post them in the Pull Request that's open.</p>
+    <p>To do this, you can either navigate to your fork (on which Codecov will suggest the app), or go to the <a href="https://github.com/marketplace/codecov" target="_blank">GitHub marketplace</a> and install it from there.</p>
+    {{ macros.render_screenshot_spoiler('screenshots2', [
+        {'alt': 'Codecov suggests to install the app', 'caption': 'Codecov will by default suggest to also enable the app for better integration.', 'url': 'img/codecov/app-install.png'},
+        {'alt': 'Allow the Codecov app access to your GitHub account', 'caption': 'The Codecov app needs access to some features of your GitHub account in order to be able to better integrate.', 'url': 'img/codecov/app-install2.png'}
+    ]) }}
+    <h2>Enable Codecov for the repository</h2>
+    <figure class="figure">
+        <img class="figure-img img-fluid" alt="That's all folks!" src="{{ url_for('static', filename='img/codecov/done.png') }}" />
+        <figcaption class="figure-caption">That's it! Codecov is enabled by default, and will start working the moment it receives a coverage report. This will be done in the next step.</figcaption>
+    </figure>
+{% endblock %}

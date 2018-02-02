@@ -1,0 +1,16 @@
+{% extends "workshop_step.html" %}
+
+{% block step_content %}
+    <h1>{{ current_step }}. Set up GitHub</h1>
+    <h2>Sign up</h2>
+    <p>If you don't have a GitHub account yet, you should now create one.</p>
+    <p><a href="https://github.com/join" class="btn btn-primary" target="_blank"><i class="fab fa-github"></i> Sign up on GitHub</a></p>
+    <p>If you have an account, you can just proceed to the next step instead.</p>
+    <h2>Fork the repository</h2>
+    <p>The source code of this application is already hosted on GitHub, so you just need to go to <a href="https://github.com/canihavesomecoffee/ci_workshop" target="_blank">canihavesomecoffee/ci_workshop</a> and then fork the repository.</p>
+    <p>This forking principle is used a lot within the open source community, because you can play around on your own personal copy and do some development work without the need to bother others (or if you disagree with the developers, you just go your own way ;) ).</p>
+    {{ macros.render_screenshot_spoiler('screenshots', [
+        {'alt': 'Fork me!', 'caption': 'The forking option of a repository can be found at the top right.', 'url': 'img/github/fork.png'},
+        {'alt': 'Forked', 'caption': 'Once the forking process is complete you are owner of this fork.', 'url': 'img/github/forked.png'},
+    ]) }}
+{% endblock %}

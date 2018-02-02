@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% set progress = (current_step / max_step * 100)|round|int %}
+    <div class="progress mt-5 mb-2">
+        <div class="progress-bar" style="width: {{ progress }}%;" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+    {%- block step_content -%}{%- endblock -%}
+    {%- if current_step <= max_step -%}
+        <form method="post" class="mt-2 pb-5" action="{{ url_for('my_workshop') }}">
+            {{ form.csrf_token }}
+            {% if current_step > 1 %}
+                {{ form.previous(class_="btn btn-secondary") }}
+            {% endif %}
+            {% if current_step < max_step %}
+                {{ form.next(class_="btn btn-primary float-right") }}
+            {% endif %}
+        </form>
+    {%- endif -%}
+{% endblock %}

@@ -12,6 +12,7 @@ class BaseTestCase(TestCase):
         :return:
         """
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        app.config['WTF_CSRF_ENABLED'] = False
         return app
 
     def setUp(self):
@@ -34,7 +35,8 @@ class BaseTestCase(TestCase):
     def create_user() -> ci_demo.User:
         u = ci_demo.User.query.filter(ci_demo.User.id == 1).first()
         if u is None:
-            u = ci_demo.User(id=1, name='test', password='')
+            # Create user with name test and password test
+            u = ci_demo.User(id=1, name='test', password='$6$rounds=1024000$XSPSVlwAI0m2l86t$aJoqULIwRFlIL7oWY6z.R1blz4yfe9pYSdsVMgm7XZK4NiJC2xEluAlS/JEWEsRBMut4X3AgSk9VWHpl4pekH.')
             ci_demo.db.session.add(u)
             ci_demo.db.session.commit()
 

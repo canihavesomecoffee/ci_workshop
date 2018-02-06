@@ -47,9 +47,8 @@ class TestGlobalContext(base.BaseTestCase):
                 self.assertIsNone(m_g.user)
 
     def test_that_the_user_is_added_to_the_global_context(self):
-        u = self.create_user()
         with mock.patch('flask.g') as m_g:
             with self.app.test_client() as c:
-                self.store_user_id_in_session(c, u)
+                u = self.create_user_and_store_in_session(c)
                 c.get('/workshop')
                 self.assertEqual(m_g.user, u)

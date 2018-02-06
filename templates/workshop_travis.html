@@ -51,7 +51,7 @@ travis-encrypt {github_username} ci_workshop</pre>
         <li>After a successful run, <a href="https://docs.travis-ci.com/user/deployment/heroku/">deploy to Heroku</a></li>
     </ul>
     <div class="alert alert-info" role="alert">You can check your .yml on <a href="http://lint.travis-ci.org/">http://lint.travis-ci.org/</a> before committing it on your repository.</div>
-    {{ macros.render_code_spoiler('snippet', ['language: python', 'python:', '  - 3.6', '  - nightly', 'install:', '  - pip install -r requirements/dev.txt', 'script:', '  - nosetests --with-cov --cov-config .coveragerc', 'after_success:', '  - codecov', 'deploy:', '  provider: heroku', '  api_key:', '    secure: {insert secret here}', '  app: {your-app-name-here}', '  on:', '    repo: {gh_username}/ci_workshop']) }}
+    {{ macros.render_code_spoiler('snippet', ['language: python', 'python:', '  - 3.6', '  - nightly', 'install:', '  - pip install -r requirements/dev.txt', 'script:', '  - nosetests --with-cov --cov-config .coveragerc', 'after_success:', '  - codecov', 'jobs:', '  include:', '    - stage: Deploy', '      script: skip', '      deploy:', '        provider: heroku', '        api_key:', '          secure: {insert secret here}', '        app: {your-app-name-here}', '        on:', '          repo: {gh_username}/ci_workshop']) }}
     <p>If the travis.yml was added to the repository, you should now see that Travis starts building whenever you make a new commit.</p>
     {{ macros.render_screenshot_spoiler('screenshots4', [
         {'alt': 'Failed build', 'caption': 'Even when you are experienced with software, things sometimes take some trial and error...', 'url': 'img/travis/failed-build.png'}

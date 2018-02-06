@@ -32,11 +32,6 @@ class TestViewRendering(base.BaseTestCase):
             self.assert_that_page_uses_the_right_template('/', 'dashboard.html')
             self.assert_context('image', ci_demo.dashboard_images[image_index])
 
-    @staticmethod
-    def set_workshop_step_for_user(user: ci_demo.User, step: int) -> None:
-        user.workshop_step = step
-        ci_demo.db.session.commit()
-
     def test_that_the_about_page_uses_the_right_template(self):
         self.assert_that_page_uses_the_right_template('/about', 'about.html')
 

@@ -9,31 +9,19 @@
     <h2>Create a new app and pipeline</h2>
     <p>Next we need to create an app and associate it with a pipeline. The dashboard of Heroku (when there are no active apps yet) should invite you to create one, so just click on that button. The name of the app should be unique, so if you decide to peek at the screenshots you can't re-use that name ;).</p>
     <p>The app should be associated to a pipeline, but as there's none yet, you should create a new one (on the same page). The name of the pipeline can be the same. For this workshop we'll add the app to the staging area.</p>
-    {{ macros.render_screenshot_spoiler('screenshots', [{'alt': 'Create New App', 'caption': 'A new app and pipeline are created at the same time.', 'url': 'img/heroku/create-new-app.png'}]) }}
     <h2>Link app to GitHub</h2>
     <p>Once the app and pipeline are created, we need to connect out GitHub repository to the app. Normally you should be on the "Deploy" tab of your app now. This tab contains various options to enable automated deployment, and we'll go for the GitHub option.</p>
     <p>You'll first need to link your GitHub account, and once that's done you just need to enter the name of the repository ("ci_workshop") and do a search for it. Once it's connected, it will allow to make manual deployments.</p>
-    {{ macros.render_screenshot_spoiler('screenshots1', [{'alt': 'Connect to GitHub', 'caption': 'The app is now linked to the GitHub repository.', 'url': 'img/heroku/connect-app-github.png'}]) }}
-    <div class="alert alert-info" role="alert">Don't enable automatic deploys from GitHub. We'd rather have Travis create the deployment for us, as that centralizes the logging in one place.</div>
+    <div class="alert alert-info" role="alert">Don't enable automatic deploys from GitHub. We'd rather have Travis create the deployment for us, so we have a single place that can handle deployments and testing.</div>
     <h2>Add resources</h2>
     <p>This website (the Flask application) requires a database for the registered users, so we need to add a Database. Heroku calls this "resources", so you should navigate to the "Resources" tab. There you can search for "Heroku Postgres", which is an Postgres database add-on. Heroku also offers other add-ons that are free, but they are unavailable without adding your Credit Card details.</p>
-    {{ macros.render_screenshot_spoiler('screenshots2', [{'alt': 'Add free add-on', 'caption': 'Heroku Postgres offers a free data plan which can be used.', 'url': 'img/heroku/add-postgres.png'}]) }}
     <h2>Connect pipeline to GitHub</h2>
     <p>Now that the application is fully configured, we can continue to finalize the pipeline settings. You can click on the pipeline name to go to the pipeline overview.</p>
     <p>Heroku by default suggests to also connect the entire pipeline to GitHub (so you can create review apps), so let's do that as well.</p>
-    {{ macros.render_screenshot_spoiler('screenshots3', [
-        {'alt': 'Connect to GitHub', 'caption': 'Connecting the pipeline to the same GitHub repository as the app will allow us to enable review apps in a later step.', 'url': 'img/heroku/connect-pipeline-github.png'},
-        {'alt': 'Pipeline overview', 'caption': 'The pipeline now should look like this.', 'url': 'img/heroku/final-result.png'}
-    ]) }}
     <h2>Enable review apps</h2>
     <p>One of the nice features of Heroku is that it allows you to have (disposable) apps automatically created when someone opens a Pull Request on the repository.</p>
     <p>To enable this functionality, you can click on the "Enable review apps" and then let Heroku commit an app.json file to your repository.</p>
-    {{ macros.render_screenshot_spoiler('screenshots4', [
-        {'alt': 'Pipeline overview', 'caption': 'Heroku provides a shortcut on how to enable the review apps on their site', 'url': 'img/heroku/pipeline-overview.png'},
-        {'alt': '', 'caption': 'Once all settings are filled in (by default you don\'t need to change anything, you can just have Heroku commit the file to your repository.', 'url': 'img/heroku/enable-review-apps.png'}
-    ]) }}
     <h2>Copy API key</h2>
     <p>The final step is to go to your account settings (top right on your screen, where you normally don't have your profile picture yet)) and scroll down to the API key section.</p>
     <p>This key is hidden by default, so you'll have to "reveal" it in order to copy it (or leave this tab open so you can copy it when you reach the next step and need it). We'll need this API key for setting up automated deployments in the next step using Travis.</p>
-    {{ macros.render_screenshot_spoiler('screenshots5', [{'alt': 'The API key', 'caption': 'This API key is needed to ensure that Travis can deploy to Heroku.', 'url': 'img/heroku/retrieve-api-key.png'}]) }}
 {% endblock %}

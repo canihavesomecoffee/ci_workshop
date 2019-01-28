@@ -23,3 +23,47 @@
         </div>
     </div>
 {%- endmacro -%}
+{%- macro render_hint_tab(hint, nr, active) -%}
+    <div class="tab-pane fade{%- if active %} show active{%- endif -%}" id="hint_{{ hint.id }}" role="tabpanel" aria-labelledby="hint-tab-{{ hint.id }}">
+        {%- if hint.type == "text" -%}
+        <p>{{ hint.text }}</p>
+        {%- elif hint.type == "screenshot" -%}
+        <figure class="figure">
+            <img class="figure-img img-fluid" alt="{{ hint.alt }}" src="{{ url_for('static', filename=hint.image) }}" />
+            {%- if hint.caption -%}
+            <figcaption class="figure-caption">{{ hint.caption }}</figcaption>
+            {%- endif -%}
+        </figure>
+        {%- elif hint.type == "code" -%}
+        <pre>
+            {%- for code_line in hint.code %}
+{{ code_line }}
+            {%- endfor -%}
+        </pre>
+        {%- endif -%}
+    </div>
+{%- endmacro -%}
+{%- macro render_hint_nav(hint, nr, active) -%}
+    <li class="nav-item">
+        <a class="nav-link{%- if active %} active{%- endif -%}" id="hint-tab-{{ hint.id }}" data-toggle="tab" href="#hint_{{ hint.id }}" role="tab" aria-controls="hint_{{ hint.id }}" {%- if active -%}aria-selected="true"{%- endif -%}>Hint {{ nr }}</a>
+    </li>
+{%- endmacro -%}
+{%- macro render_hints_section(hints, max) -%}
+    {%- set should_disable = "" -%}
+    {%- set hint_text = "Request hint" -%}
+    {%- if hints|length == max -%}
+        {%- set should_disable = 'disabled="disabled"' -%}
+            {%- set hint_text = "You used up all hints :(" -%}
+    {%- endif -%}
+    <p><button class="btn btn-outline-info hint-btn" type="button" {{ should_disable }}>{{ hint_text }}</button></p>
+    <ul class="nav nav-tabs" id="hints_nav" role="tablist" {%- if hint_count == 0 -%}style="display:none;"{%- endif -%}>
+        {%- for hint in hints %}
+            {{ render_hint_nav(hint, loop.index, loop.first) }}
+        {%- endfor -%}
+    </ul>
+    <div class="tab-content" id="hints_content">
+        {%- for hint in hints %}
+            {{ render_hint_tab(hint, loop.index, loop.first) }}
+        {%- endfor -%}
+    </div>
+{%- endmacro -%}

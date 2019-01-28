@@ -5,6 +5,7 @@
     <div class="progress mt-5 mb-2">
         <div class="progress-bar" style="width: {{ progress }}%;" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
+    <button class="btn btn-outline-info float-right" data-toggle="modal" data-target="#hintsModal" type="button">Need help?</button>
     {%- block step_content -%}{%- endblock -%}
     {%- if current_step <= max_step -%}
         <form method="post" class="mt-2 pb-5" action="{{ url_for('my_workshop') }}">
@@ -17,4 +18,49 @@
             {% endif %}
         </form>
     {%- endif -%}
+    <div class="modal fade" id="hintsModal" tabindex="-1" role="dialog" aria-labelledby="hintsTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="hintsTitle">Stuck on this step?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>There are some hints available for this step. If these hints are not sufficient, check with the instructor, or open a GitHub issue.</p>
+                    {{ macros.render_hints_section(hints, maxHintsForStep) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        /* global $ */
+        $(document).ready(() => {
+            $(".hint-btn").on("click", async (evt) => {
+                const $btn = $(evt.currentTarget);
+                const result = await $.ajax({
+                    url: "{{ url_for('get_hint') }}",
+                    type: "POST"
+                });
+                const disableButton = () => {
+                    $btn.attr('disabled', 'disabled').text('You used up all hints :(');
+                };
+                if(result.error) {
+                    disableButton();
+                } else {
+                    $("#hints_nav").show().append(result.top);
+                    $("#hints_content").append(result.content);
+                    $('#hints_nav li:last-child a').tab('show');
+                    if (result.last) {
+                        console.log("Exhausted hints");
+                        disableButton();
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}

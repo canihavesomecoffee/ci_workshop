@@ -2,12 +2,17 @@ import os
 import random
 import flask
 import typing
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from functools import wraps
 from passlib.apps import custom_app_context as pwd_context
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length
+
+from hint import Hint, WorkshopHints
 
 app = flask.Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', '')
@@ -15,19 +20,7 @@ app.config['SECRET_KEY'] = 'foo-bar'
 app.config['CSRF_SESSION_KEY'] = 'foo-bar'
 db = SQLAlchemy(app)
 
-dashboard_images = [
-    'img/welcomeA.jpg',
-    'img/welcomeB.jpg',
-    'img/welcomeC.jpg'
-]
-
-workshop_steps = [
-    'workshop_github.html',
-    'workshop_codecov.html',
-    'workshop_heroku.html',
-    'workshop_travis.html',
-    'workshop_overview.html'
-]
+workshop_hints = WorkshopHints()
 
 
 class User(db.Model):
@@ -38,6 +31,7 @@ class User(db.Model):
     name = db.Column(db.String(32), unique=True)
     password = db.Column(db.String(255), nullable=False)
     workshop_step = db.Column(db.Integer, default=1, nullable=False)
+    hints = relationship("UserHints", back_populates="user")
 
     def is_password_valid(self, password: str) -> bool:
         """
@@ -57,6 +51,15 @@ class User(db.Model):
         self.password = pwd_context.encrypt(new_password, category='admin')
 
 
+class UserHints(db.Model):
+    """
+    Keep track of taken hints by a user.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, ForeignKey("user.id"), primary_key=True)
+    user = relationship("User", back_populates="hints")
+
+
 class LoginForm(FlaskForm):
     """
     Represents the login form.
@@ -74,6 +77,21 @@ class WorkshopForm(FlaskForm):
     previous = SubmitField('Return one step')
 
 
+dashboard_images = [
+    'img/welcomeA.jpg',
+    'img/welcomeB.jpg',
+    'img/welcomeC.jpg'
+]
+
+workshop_steps = [
+    'workshop_github.html',
+    'workshop_codecov.html',
+    'workshop_heroku.html',
+    'workshop_travis.html',
+    'workshop_overview.html'
+]
+
+
 def login_required(wrapped_method: typing.Callable) -> typing.Callable:
     """
     Decorator that redirects to the login page if a user is not logged in.
@@ -89,6 +107,39 @@ def login_required(wrapped_method: typing.Callable) -> typing.Callable:
         return wrapped_method(*args, **kwargs)
 
     return decorated_function
+
+
+def get_valid_step(current_step, max_step):
+    if current_step < 1:
+        current_step = 1
+    elif current_step > max_step:
+        current_step = max_step
+    return current_step
+
+
+def get_active_hints(user: User, hints) -> typing.List[Hint]:
+    visible_hints = [hint.id for hint in user.hints]
+    return list(filter(lambda h: h.id in visible_hints, hints.get_hints_for_step(user.workshop_step)))
+
+
+def retrieve_next_hint(user: User, current_step: int, hints: WorkshopHints) -> typing.Optional[Hint]:
+    used_hints = [hint.id for hint in user.hints]
+
+    def filter_criterium(hint):
+        return hint.id not in used_hints
+
+    hints_for_step = list(filter(filter_criterium, hints.get_hints_for_step(current_step)))
+    hints_for_step.sort(key=lambda h: h.id)
+    return None if len(hints_for_step) == 0 else hints_for_step[0]
+
+
+def unlock_all_hints_for_step(current_step, user, hints):
+    active_hints_current_step = [h.id for h in get_active_hints(user, hints)]
+    for hint in hints.get_hints_for_step(current_step):
+        if hint.id not in active_hints_current_step:
+            user_hint = UserHints(id=hint.id, user_id=user.id)
+            db.session.add(user_hint)
+    db.session.commit()
 
 
 @app.before_request
@@ -161,26 +212,46 @@ def my_workshop() -> flask.Response:
 
     :return:
     """
-    step = flask.g.user.workshop_step
+    current_step = flask.g.user.workshop_step
     max_step = len(workshop_steps)
 
     form = WorkshopForm()
     if form.validate_on_submit():
         # Store new step
         if form.next.data:
-            step = step + 1
+            unlock_all_hints_for_step(current_step, flask.g.user, workshop_hints)
+            current_step += 1
         else:
-            step = step - 1
+            current_step -= 1
 
-        if step < 1:
-            step = 1
-        elif step > max_step:
-            step = max_step
+        current_step = get_valid_step(current_step, max_step)
 
-        flask.g.user.workshop_step = step
+        flask.g.user.workshop_step = current_step
         db.session.commit()
 
-    return flask.render_template(workshop_steps[step - 1], form=form, current_step=step, max_step=max_step)
+    return flask.render_template(
+        workshop_steps[current_step - 1], form=form, current_step=current_step, max_step=max_step,
+        hints=get_active_hints(flask.g.user, workshop_hints), maxHintsForStep=len(workshop_hints.get_hints_for_step(current_step))
+    )
+
+
+@app.route('/my_workshop/hint', methods=['POST'])
+@login_required
+def get_hint() -> flask.Response:
+    current_step = get_valid_step(flask.g.user.workshop_step, len(workshop_steps))
+    hint = retrieve_next_hint(flask.g.user, current_step, workshop_hints)
+    if hint is not None:
+        sorted_hints = sorted(workshop_hints.get_hints_for_step(current_step), key=lambda h: h.id)
+        nr = sorted_hints.index(hint) + 1
+        user_hint = UserHints(id=hint.id, user_id=flask.g.user.id)
+        db.session.add(user_hint)
+        db.session.commit()
+        return flask.jsonify(
+            content=flask.render_template("hint.html", hint=hint, nr=nr),
+            top=flask.render_template("hint_top.html", hint=hint, nr=nr),
+            last=(len(sorted_hints) == nr)
+        )
+    return flask.jsonify(error="No hints available")
 
 
 @app.route('/about')

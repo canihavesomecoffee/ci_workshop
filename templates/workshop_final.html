@@ -1,0 +1,10 @@
+{% extends "workshop_step.html" %}
+
+{% block step_content %}
+    <p class="text-center"><img class="img-fluid" alt="So long and thanks for all the fish" src="{{ url_for('static', filename='img/thanks.jpg', _external=True) }}" /></p>
+    <p>This workshop is now officially to an end. We hope you enjoyed it.</p>
+    {%- if not ignore -%}
+    <p>If you want to keep an offline copy of the contents of this workshop...</p>
+    <p class="pb-5"><a class="btn btn-primary" href="{{ url_for('download_pdf') }}" role="button"><i class="fas fa-download"></i> Download worskhop as PDF</a></p>
+    {%- endif -%}
+{% endblock %}

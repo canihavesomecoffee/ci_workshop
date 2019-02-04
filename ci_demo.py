@@ -89,7 +89,8 @@ workshop_steps = [
     'workshop_codecov.html',
     'workshop_heroku.html',
     'workshop_travis.html',
-    'workshop_overview.html'
+    'workshop_overview.html',
+    'workshop_final.html'
 ]
 
 

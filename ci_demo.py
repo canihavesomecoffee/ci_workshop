@@ -110,7 +110,14 @@ def login_required(wrapped_method: typing.Callable) -> typing.Callable:
     return decorated_function
 
 
-def get_valid_step(current_step, max_step):
+def get_valid_step(current_step: int, max_step: int) -> int:
+    """
+    Checks if the current step is within boundaries and returns a corrected step.
+
+    :param current_step: The current step to check.
+    :param max_step: The maximum allowed step.
+    :return: A corrected step between 1 and the maximum step.
+    """
     if current_step < 1:
         current_step = 1
     elif current_step > max_step:
@@ -118,12 +125,27 @@ def get_valid_step(current_step, max_step):
     return current_step
 
 
-def get_active_hints(user: User, hints) -> typing.List[Hint]:
+def get_active_hints(user: User, hints: WorkshopHints) -> typing.List[Hint]:
+    """
+    Retrieves the hints that were already activated for this user and workshop step.
+
+    :param user: The current user.
+    :param hints: All available hints.
+    :return: A list of hints.
+    """
     visible_hints = [hint.id for hint in user.hints]
     return list(filter(lambda h: h.id in visible_hints, hints.get_hints_for_step(user.workshop_step)))
 
 
 def retrieve_next_hint(user: User, current_step: int, hints: WorkshopHints) -> typing.Optional[Hint]:
+    """
+    Retrieves the next hint (if available) for the user and the current step.
+
+    :param user: The current user.
+    :param current_step: The current step for the user
+    :param hints: All available hints.
+    :return: A hint, or None when not found.
+    """
     used_hints = [hint.id for hint in user.hints]
 
     def filter_criterium(hint):
@@ -134,7 +156,15 @@ def retrieve_next_hint(user: User, current_step: int, hints: WorkshopHints) -> t
     return None if len(hints_for_step) == 0 else hints_for_step[0]
 
 
-def unlock_all_hints_for_step(current_step, user, hints):
+def unlock_all_hints_for_step(current_step: int, user: User, hints: WorkshopHints) -> None:
+    """
+    Unlocks all hints for a user on a certain step.
+
+    :param current_step: The current step for the user
+    :param user: The current user.
+    :param hints: All available hints.
+    :return: void.
+    """
     active_hints_current_step = [h.id for h in get_active_hints(user, hints)]
     for hint in hints.get_hints_for_step(current_step):
         if hint.id not in active_hints_current_step:
@@ -143,7 +173,15 @@ def unlock_all_hints_for_step(current_step, user, hints):
     db.session.commit()
 
 
-def get_rendered_block_content(template, block="content", **kwargs):
+def get_rendered_block_content(template: str, block: str = "content", **kwargs) -> str:
+    """
+    Retrieves a given block from a given template, and renders it into html.
+
+    :param template: The template to retrieve the block from.
+    :param block: The block of content to retrieve and render.
+    :param kwargs: Optional arguments to be passed for rendering the block.
+    :return: The rendered block.
+    """
     goal_template = app.jinja_env.get_template(template)
     goal_block = goal_template.blocks[block]
     goal_context = goal_template.new_context(kwargs)
@@ -239,7 +277,8 @@ def my_workshop() -> flask.Response:
 
     return flask.render_template(
         workshop_steps[current_step - 1], form=form, current_step=current_step, max_step=max_step,
-        hints=get_active_hints(flask.g.user, workshop_hints), maxHintsForStep=len(workshop_hints.get_hints_for_step(current_step))
+        hints=get_active_hints(flask.g.user, workshop_hints),
+        maxHintsForStep=len(workshop_hints.get_hints_for_step(current_step))
     )
 
 
@@ -274,6 +313,11 @@ def about() -> flask.Response:
 
 @app.route('/download_pdf')
 def download_pdf() -> flask.Response:
+    """
+    Triggers the download of a single page PDF of the worskhop.
+
+    :return:
+    """
     pdf_name = "workshop.pdf"
     if not os.path.isfile(pdf_name):
         rendered_template = flask.render_template(

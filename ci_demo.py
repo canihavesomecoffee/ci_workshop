@@ -9,7 +9,8 @@ from functools import wraps
 from passlib.apps import custom_app_context as pwd_context
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField
+from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, Length
 from xhtml2pdf import pisa
 
@@ -68,6 +69,16 @@ class LoginForm(FlaskForm):
     name = StringField('Name', [DataRequired(), Length(max=10)])
     password = PasswordField('Password', [DataRequired()])
     submit = SubmitField('Log in')
+
+
+class ContactForm(FlaskForm):
+    """
+    Represents the contact form.
+    """
+    name = StringField('Name', [DataRequired()])
+    email = EmailField('Email address', [DataRequired()])
+    message = TextAreaField('Your message', [DataRequired()])
+    submit = SubmitField('Send')
 
 
 class WorkshopForm(FlaskForm):
@@ -339,6 +350,17 @@ def download_pdf() -> flask.Response:
                 flask.abort(400)
 
     return flask.send_file(pdf_name, as_attachment=True, cache_timeout=-1)
+
+
+@app.route('/contact')
+def contact() -> flask.Response:
+    """
+    Shows a contact form for users
+
+    :return:
+    """
+    form = ContactForm()
+    return flask.render_template('contact.html', form=form)
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+import itertools
 from abc import ABCMeta, abstractmethod
 from typing import List, Optional
 
@@ -94,3 +95,8 @@ class WorkshopHints:
 
     def get_hints_for_step(self, step: int) -> List[Hint]:
         return self.__hints[step] if step in self.__hints else []
+
+    def get_all_hints(self) -> List[Hint]:
+        return list(itertools.chain.from_iterable(self.__hints.values()))
+
+

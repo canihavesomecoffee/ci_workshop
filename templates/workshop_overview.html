@@ -1,7 +1,7 @@
 {% extends "workshop_step.html" %}
 
 {% block step_content %}
-    <p class="text-center"><img class="img-fluid" alt="That's it!" src="{{ url_for('static', filename='img/end.gif') }}" /></p>
+    <p class="text-center"><img class="img-fluid" alt="That's it!" src="{{ url_for('static', filename='img/end.gif', _external=True) }}" /></p>
     <p>We now should have set up a full CI pipeline. Whenever you:</p>
     <ul>
         <li>Open a Pull Request</li>
@@ -16,4 +16,8 @@
         <li>Try to integrate some integration test services (e.g. PhantomJS on Travis (see <a href="https://docs.travis-ci.com/user/gui-and-headless-browsers/#Using-PhantomJS" target="_blank">Using PhantomJS</a> and <a href="https://docs.travis-ci.com/user/build-stages/deploy-heroku/" target="_blank">Build stages</a>)</li>
         <li>...</li>
     </ul>
+    {%- if not ignore -%}
+    <p>If you want to download the contents of this workshop, you can do this by clicking the button below</p>
+    <p class="pb-5"><a class="btn btn-primary" href="{{ url_for('download_pdf') }}" role="button"><i class="fas fa-download"></i> Download worskhop as PDF</a></p>
+    {%- endif -%}
 {% endblock %}

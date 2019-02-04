@@ -23,8 +23,10 @@
     <p>We will use Heroku to deploy this app onto automatically once the tests pass.</p>
     <h2>Bringing it all together</h2>
     <p>If all the tools above are combined and tied together, the next flow can be achieved:</p>
-    <p class="text-center"><img alt="pipeline flow" class="img-fluid" src="{{ url_for('static', filename='img/flow.png') }}" /></p>
+    <p class="text-center"><img alt="pipeline flow" class="img-fluid" src="{{ url_for('static', filename='img/flow.png', _external=True) }}" /></p>
+    {%- if not ignore -%}
     <h2>Ready, set, go</h2>
     <p>One last thing before you start: If you can't find the solution, you can request some hints on the page, but if you run out of hints, just ask a question!</p>
     <p class="pb-5"><a class="btn btn-lg btn-primary" href="{{ url_for('my_workshop') }}" role="button"><i class="fas fa-play"></i> Start my workshop</a></p>
+    {%- endif -%}
 {% endblock %}

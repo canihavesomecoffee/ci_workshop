@@ -11,6 +11,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length
+from xhtml2pdf import pisa
 
 from hint import Hint, WorkshopHints
 
@@ -142,6 +143,13 @@ def unlock_all_hints_for_step(current_step, user, hints):
     db.session.commit()
 
 
+def get_rendered_block_content(template, block="content", **kwargs):
+    goal_template = app.jinja_env.get_template(template)
+    goal_block = goal_template.blocks[block]
+    goal_context = goal_template.new_context(kwargs)
+    return ''.join(goal_block(goal_context))
+
+
 @app.before_request
 def before_request() -> None:
     user_id = flask.session.get('user_id', 0)
@@ -262,6 +270,30 @@ def about() -> flask.Response:
     :return:
     """
     return flask.render_template('about.html')
+
+
+@app.route('/download_pdf')
+def download_pdf() -> flask.Response:
+    pdf_name = "workshop.pdf"
+    if not os.path.isfile(pdf_name):
+        rendered_template = flask.render_template(
+            "single_page_pdf.html",
+            goal_block=get_rendered_block_content("workshop.html", ignore=True),
+            about_block=get_rendered_block_content("about.html"),
+            steps=[get_rendered_block_content(
+                step,
+                block="step_content",
+                current_step=(workshop_steps.index(step) + 1),
+                ignore=True
+            ) for step in workshop_steps],
+            hints=workshop_hints.get_all_hints()
+        )
+        with open(pdf_name, "w+b") as fh:
+            status = pisa.CreatePDF(rendered_template, dest=fh)
+            if status.err:
+                flask.abort(400)
+
+    return flask.send_file(pdf_name, as_attachment=True, cache_timeout=-1)
 
 
 if __name__ == '__main__':

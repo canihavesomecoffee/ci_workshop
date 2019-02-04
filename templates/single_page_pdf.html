@@ -1,0 +1,93 @@
+{%- import 'macros.html' as macros -%}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+    <title>CI Demo - Linux stack</title>
+
+
+    <script defer src="{{ url_for('static', filename='font-awesome/js/fontawesome-all.min.js') }}"></script>
+    <style>
+        @page {
+            size: a4 portrait;
+            @frame content_frame {
+                left: 50pt;
+                width: 512pt;
+                top: 90pt;
+                height: 632pt;
+            }
+            @frame footer_frame {
+                -pdf-frame-content:footer_content;
+                left: 50pt; width: 512pt; top: 772pt; height: 20pt;
+            }
+        }
+
+        img {
+            vertical-align: middle;
+            display: block;
+        }
+
+        .alert-info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+        .alert {
+            position: relative;
+            padding: 12px 20px;
+            margin-bottom: 16px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 20px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="footer_content">Single page export of the CI workshop. Page <pdf:pagenumber> of <pdf:pagecount>
+    </div>
+    <!-- Content -->
+    <div class="alert alert-info" role="alert">Note: This is a single page export of the workshop. You can find the hints on the end of the document.</div>
+    {{ about_block|safe }}
+    {{ goal_block|safe }}
+    {%- for step in steps -%}
+        {{ step|safe }}
+    {%- endfor -%}
+    <h1>Hints</h1>
+    {%- for hint in hints -%}
+        <div class="card" style="margin-bottom: 10px;">
+            <div class="card-body">
+                {%- if hint.type == "text" -%}
+                <p>{{ hint.text }}</p>
+                {%- elif hint.type == "screenshot" -%}
+                    <p><img class="figure-img img-fluid" alt="{{ hint.alt }}" src="{{ url_for('static', filename=hint.image, _external=True) }}" />
+                    {%- if hint.caption -%}
+                    {{ hint.caption }}
+                    {%- endif -%}
+                    </p>
+                {%- elif hint.type == "code" -%}
+                <pre>
+                    {%- for code_line in hint.code %}
+        {{ code_line }}
+                    {%- endfor -%}
+                </pre>
+                {%- endif -%}
+            </div>
+        </div>
+        <hr />
+    {%- endfor -%}
+</body>
+</html>

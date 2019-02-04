@@ -11,7 +11,7 @@
     <p>To do this, you can either navigate to your fork (on which Codecov will suggest to install the app), or go to the <a href="https://github.com/marketplace/codecov" target="_blank">GitHub marketplace</a> and install it from there.</p>
     <h2>Enable Codecov for the repository</h2>
     <figure class="figure">
-        <img class="figure-img img-fluid" alt="That's all folks!" src="{{ url_for('static', filename='img/codecov/done.png') }}" />
+        <img class="figure-img img-fluid" alt="That's all folks!" src="{{ url_for('static', filename='img/codecov/done.png', _external=True) }}" />
         <figcaption class="figure-caption">That's it! Codecov is enabled by default, and will start working the moment it receives a coverage report. This will be done in the next step.</figcaption>
     </figure>
 {% endblock %}

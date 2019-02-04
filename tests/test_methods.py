@@ -1,6 +1,10 @@
 from random import randint
 
-from ci_demo import get_valid_step, User, retrieve_next_hint, get_active_hints, UserHints, db, unlock_all_hints_for_step
+import mock
+from jinja2 import Template
+
+from ci_demo import get_valid_step, User, retrieve_next_hint, get_active_hints, UserHints, db, \
+    unlock_all_hints_for_step, get_rendered_block_content
 from hint import WorkshopHints, TextHint
 from tests.base import BaseTestCase
 
@@ -58,3 +62,12 @@ class TestMethods(BaseTestCase):
         self.assertIsNone(UserHints.query.filter(UserHints.id == new_hint.id).first())
         unlock_all_hints_for_step(1, u, WorkshopHints({1: [hint, new_hint]}))
         self.assertIsNotNone(UserHints.query.filter(UserHints.id == new_hint.id).first())
+
+    def test_get_rendered_block_returns_only_the_block_contents(self):
+        expected = "Expected foo bar"
+        template_content = """
+        Unexpected
+        {% block content %}""" + expected + "{% endblock %}"
+        with mock.patch('ci_demo.app.jinja_env.get_template') as m_get:
+            m_get.return_value = Template(template_content)
+            self.assertEqual(expected, get_rendered_block_content("foo"))

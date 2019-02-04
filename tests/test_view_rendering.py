@@ -1,3 +1,5 @@
+import os
+
 from flask.testing import FlaskClient
 from typing import Optional
 from unittest import mock
@@ -8,6 +10,7 @@ from tests import base
 
 class TestViewRendering(base.BaseTestCase):
     render_templates = False
+    workshop_pdf = 'workshop.pdf'
 
     def assert_that_page_uses_the_right_template(self, url: str, expected_template: str,
                                                  client: Optional[FlaskClient] = None) -> None:
@@ -56,5 +59,38 @@ class TestViewRendering(base.BaseTestCase):
     def test_that_the_dashboard_is_rendered_with_the_correct_arguments(self):
         for i in range(len(ci_demo.dashboard_images)):
             self.render_dashboard_with_image(i)
+
+    def test_that_the_pdf_download_serves_the_correct_file(self):
+        file_content = b"foo bar baz"
+        with open(self.workshop_pdf, 'wb') as fh:
+            fh.write(file_content)
+
+        with self.app.test_client() as c:
+            response = c.get("/download_pdf")
+            self.assertEqual(file_content, response.data)
+
+    def test_that_the_pdf_download_generates_a_pdf_when_none_is_present(self):
+        self.assertFalse(os.path.isfile(self.workshop_pdf))
+        with self.app.test_client() as c:
+            response = c.get("/download_pdf")
+            with open(self.workshop_pdf, "rb") as fh:
+                expected_content = fh.read()
+                self.assertEqual(expected_content, response.data)
+
+    def test_that_the_pdf_download_raises_a_400_error(self):
+        self.assertFalse(os.path.isfile(self.workshop_pdf))
+        with mock.patch('xhtml2pdf.pisa.CreatePDF') as m_pdf:
+            class MockError:
+                err = True
+            m_pdf.return_value = MockError()
+            with self.app.test_client() as c:
+                self.assert400(c.get("/download_pdf"))
+
+    def tearDown(self):
+        try:
+            os.remove(self.workshop_pdf)
+        except FileNotFoundError:
+            pass
+
 
 

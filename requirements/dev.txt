@@ -5,3 +5,4 @@ blinker>=1.4.0
 nose
 nose-cov
 codecov
+selenium

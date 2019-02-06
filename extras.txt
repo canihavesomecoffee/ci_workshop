@@ -1,5 +1,6 @@
 REPLACE_THIS_WITH_THE_NUMBER_OF_EXTRAS extras => just for you
 - add an extra random image to the landing page
+- use the safety net of unittests to refactor some of the variables in retrieve_next_hint in ci_demo.py
 - Use TDD to add the extra's defined in this file into the workshop overview page
 -- do this in REPLACE_THIS_WITH_THE_NUMBER_OF_SUB_STEPS
 -- start with an acceptance test => selenium

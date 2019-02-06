@@ -39,6 +39,16 @@ travis-encrypt {github_username} ci_workshop</pre>
                 <li>nightly</li>
             </ul>
         </li>
+        <li>Runs the functional tests on a 'live' server w Selenium and Firefox<br />
+            <ul>
+                <li>Get the geckodriver via wget 'wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver'</li>
+                <li>Untar it in a safe location</li>
+                <li>Make sure it's executable (you might need sudo rights for this)</li>
+                <li>Selenium should be able to find the geckodriver executable => update your ($PATH)</li>
+                <li>Install the Firefox binary as an addon</li>
+                <li>Investigate how to get this running in a separate stage</li>
+            </ul>
+        </li>
         <li>Upload the coverage results to the tool you configured in the previous step (<a href="https://github.com/codecov/example-python">example for Codecov</a>)</li>
         <li>After a successful run, <a href="https://docs.travis-ci.com/user/deployment/heroku/">deploy to Heroku</a></li>
     </ul>

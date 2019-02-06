@@ -27,13 +27,9 @@ class BaseSelenium(LiveServerTestCase):
         """
         db.create_all()
         db.session.commit()
-        chrome_options = Options()
-        chrome_options.add_argument("-headless")
-        # chrome_options.add_argument("--no-sandbox")  # This make Chromium reachable
-        # chrome_options.add_argument("--no-default-browser-check")  # Overrides default choices
-        # chrome_options.add_argument("--no-first-run")
-        # chrome_options.add_argument("--disable-default-apps")
-        self.browser = webdriver.Firefox(firefox_options=chrome_options)
+        firefox_options = Options()
+        firefox_options.add_argument("-headless")
+        self.browser = webdriver.Firefox(firefox_options=firefox_options)
         self.browser.implicitly_wait(10)
 
     def tearDown(self):
@@ -54,8 +50,22 @@ class TestNavBar(BaseSelenium):
         # Given
         expected_items_in_navbar = 4
         self.browser.get(self.get_server_url())
-        navbar = self.browser.find_element_by_id("navbarCollapse")
+        nav_bar = self.browser.find_element_by_id("navbarCollapse")
         # When
-        items_in_nav_bar = navbar.find_elements_by_class_name("nav-item")
+        items_in_nav_bar = nav_bar.find_elements_by_class_name("nav-item")
         # Then
         self.assertEqual(expected_items_in_navbar, len(items_in_nav_bar))
+
+
+class TestContactForm(BaseSelenium):
+    def test_contact_form_is_shown_when_button_is_clicked(self):
+        # Given
+        number_of_wanted_contact_forms = 1
+        self.browser.get(self.get_server_url())
+        nav_bar = self.browser.find_element_by_id("navbarCollapse")
+        contact_button = nav_bar.find_element_by_link_text("Contact")
+        # When
+        contact_button.click()
+        contact_forms = self.browser.find_elements_by_id("contact-form")
+        # Then
+        self.assertEqual(number_of_wanted_contact_forms, len(contact_forms))

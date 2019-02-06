@@ -3,9 +3,10 @@ from abc import ABCMeta, abstractmethod
 from typing import List, Optional
 
 GITHUB = 1
-TRAVIS = 2
-HEROKU = 3
-CODECOV = 4
+CODECOV = 2
+TRAVIS = 3
+HEROKU = 4
+PIPELINE = 5
 
 
 class Hint(metaclass=ABCMeta):
@@ -67,12 +68,28 @@ class WorkshopHints:
                     ScreenshotHint(17, "img/travis/enable.png", "Flip the switch", "Enabling Travis CI for a repository is as \"easy\" as toggling a switch."),
                     ScreenshotHint(18, "img/travis/secure-encrypt.png", "Securely encrypted API key", "Using the python tool you get a securely encrypted key that can be worrilessly pasted in the Travis configuration file."),
                     CodeHint(19, code=[
+                        "sudo: true",
                         "language: python",
-                        "python:",
+                        "python:"
                         "  - 3.6",
                         "  - nightly",
+                        "",
+                        "env:",
+                        "  - MOZ_HEADLESS=1",
+                        "",
+                        "addons:",
+                        "  firefox: latest",
+                        "",
                         "install:",
                         "  - pip install -r requirements/dev.txt",
+                        "",
+                        "before_install:",
+                        "  - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz",
+                        "  - mkdir geckodriver",
+                        "  - tar -xzf geckodriver-v0.24.0-linux64.tar.gz -C geckodriver",
+                        "  - sudo chmod +x $PWD/geckodriver/geckodriver",
+                        "  - export PATH=$PATH:$PWD/geckodriver",
+                        "",
                         "script:",
                         "  - nosetests --with-cov --cov-config .coveragerc",
                         "after_success:",
@@ -90,6 +107,65 @@ class WorkshopHints:
                         "          repo: {gh_username}/ci_workshop"
                     ]),
                     ScreenshotHint(20, "img/travis/failed-build.png", "Failed build", "Even when you are experienced with software, things sometimes take some trial and error...")
+                ],
+                PIPELINE: [
+                    ScreenshotHint(21, "img/pipeline/badges.png", "This is how it could look"),
+                    TextHint(22, "Most of the time you just need to fill in some parameters for the badge, and shields.io will generate the markdown for you..."),
+                    CodeHint(23, code=[
+                        "# Example of shields for the main repository, you just need to substitute some things here...",
+                        "![](https://img.shields.io/website-up-down-green-red/https/barco-ci-workshop.herokuapp.com.svg?label=Heroku%20instance&style=flat)",
+                        "![](https://img.shields.io/travis/canihavesomecoffee/ci_workshop/master.svg?style=flat)",
+                        "![](https://img.shields.io/github/issues-pr/canihavesomecoffee/ci_workshop.svg?style=flat)",
+                        "![](https://img.shields.io/codecov/c/github/canihavesomecoffee/ci_workshop/travis-test.svg?style=flat)"
+                    ]),
+                    TextHint(24, "If you click 'New pull request' after navigating to the branch, you can compare across forks to open the pull request on your fork"),
+                    ScreenshotHint(25, "img/pipeline/pull_request.png", "Creating a pull request across forks"),
+                    TextHint(26, "For the database model you can also look at the existing models for User and UserHints. A minimalistic Joke model contains a column for an ID and a column for the joke."),
+                    CodeHint(27, code=[
+                        "# Sample implementation for a Joke model. This should go in ci_demo.py",
+                        "class Joke(db.Model):",
+                        "\"\"\"",
+                        "Represents a user in the database.",
+                        "\"\"\"",
+                        "",
+                        "id = db.Column(db.Integer, primary_key=True)",
+                        "joke = db.Column(db.Text())"
+                    ]),
+                    TextHint(28, "You can just create new instances of Hint, add them to the session and commit at the end."),
+                    CodeHint(29, code=[
+                        "# Sample for adding a joke (note: quality not guaranteed)",
+                        "joke = Joke(joke=\"What's orange and sounds like a parrot? A carrot!\")",
+                        "db.session.add(joke)",
+                        "db.session.commit()"
+                    ]),
+                    TextHint(30, "Just take a look at the existing routes ;)"),
+                    CodeHint(31, code=[
+                        "# Sample code for selecting a random joke and passing it to a template",
+                        "@app.route('/random_joke')",
+                        "def random_joke() -> flask.Response:",
+                        "    joke = db.session.query(Joke).order_by(func.rand()).first()",
+                        "    return flask.render_template(\"joke.html\")"
+                    ]),
+                    TextHint(32, "For adding new jokes, you should combine the idea of the login page (submitting a form) with adding a new joke (as you did for populating the table)."),
+                    CodeHint(33, code=[
+                        "# Sample code for creating a new joke",
+                        "class JokeForm(FlaskForm):"
+                        "    joke = TextField('Joke', [DataRequired()])",
+                        "    submit = SubmitField('Store joke')",
+                        "",
+                        "",
+                        "@app.route('/add_joke', methods=['GET', 'POST'])",
+                        "def add_joke() -> flask.Response:",
+                        "    form = JokeForm()",
+                        "    if form.validate_on_submit():",
+                        "        # Store in DB",
+                        "        joke = Joke(joke=form.joke)",
+                        "        db.session.add(joke)",
+                        "        db.session.commit()",
+                        "        flask.flash('Joke saved!', 'success-message')",
+                        "",
+                        "    return flask.render_template('add_joke.html', form=form)",
+                    ])
                 ]
             }
 
@@ -98,5 +174,3 @@ class WorkshopHints:
 
     def get_all_hints(self) -> List[Hint]:
         return list(itertools.chain.from_iterable(self.__hints.values()))
-
-

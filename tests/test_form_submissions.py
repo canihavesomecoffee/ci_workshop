@@ -115,7 +115,7 @@ class TestRequestHintSubmissions(base.BaseTestCase):
     def test_that_no_hint_can_be_retrieved_for_an_invalid_step(self):
         with self.app.test_client() as c:
             u = self.create_user_and_store_in_session(c)
-            self.set_workshop_step_for_user(u, 5)
+            self.set_workshop_step_for_user(u, len(ci_demo.workshop_steps) + 1)
 
             response = c.post('/my_workshop/hint')
             self.assertEquals(response.json, dict(error="No hints available"))

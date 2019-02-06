@@ -3,7 +3,7 @@
 {% block content %}
     <h1 class="mt-5">Contact</h1>
     <p>You can get in touch with us by filling in the form below.</p>
-    <form class="mt-5" method="post" onsubmit="alert('Just kidding! We don\'t want to be contacted!'); return false;">
+    <form id='contact-form' class="mt-5" method="post" onsubmit="alert('Just kidding! We don\'t want to be contacted!'); return false;">
         {{ form.csrf_token }}
         <div class="form-group">
             {{ form.name.label }}
